@@ -1,11 +1,4 @@
 [build]
+  base = ""                # leave empty or set correctly (like "app" if your code is in /app)
+  publish = "dist"         # for Vite or similar
   command = "npm run build"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "18"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
