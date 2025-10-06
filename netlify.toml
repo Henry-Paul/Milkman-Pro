@@ -1,0 +1,23 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/owner/*"
+  to = "/frontend/dist/index.html"
+  status = 200
+
+[[redirects]]  
+  from = "/agency/*"
+  to = "/frontend-agency/dist/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/customer/*"
+  to = "/frontend-customer/dist/index.html"
+  status = 200
+
+# Catch-all for root
+[[redirects]]
+  from = "/"
+  to = "/frontend-agency/dist/index.html"
+  status = 200
