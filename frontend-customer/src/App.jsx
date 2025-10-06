@@ -591,5 +591,35 @@ function App() {
     </Router>
   );
 }
+// frontend-customer/src/App.jsx
+import React from "react";
+
+// Utility to safely load icons from lucide-react
+const loadIcon = (iconName) => {
+  try {
+    // Try to require lucide-react dynamically
+    const icons = require("lucide-react");
+    return icons[iconName] || DefaultIcon;
+  } catch (err) {
+    console.warn("lucide-react not found, using fallback icon");
+    return DefaultIcon;
+  }
+};
+
+// Fallback icon if lucide-react is not available
+const DefaultIcon = () => <span>☕</span>; // Emoji or any simple SVG
+
+function App() {
+  // Use the icon you want, e.g., 'Coffee', 'Activity', 'AlertCircle'
+  const MyIcon = loadIcon("Coffee");
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+      <h1>Welcome to Milkman Pro!</h1>
+      <p>Here is your icon (safe for all scenarios):</p>
+      <MyIcon />
+    </div>
+  );
+}
 
 export default App;
