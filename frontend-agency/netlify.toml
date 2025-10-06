@@ -1,17 +1,11 @@
 [build]
-  publish = "."
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
-  from = "/owner/*"
-  to = "/frontend/dist/index.html"
-  status = 200
-
-[[redirects]]  
-  from = "/agency/*"
-  to = "/frontend-agency/dist/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/customer/*"
-  to = "/frontend-customer/dist/index.html"
+  from = "/*"
+  to = "/index.html"
   status = 200
