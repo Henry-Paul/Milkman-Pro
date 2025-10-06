@@ -1,6 +1,6 @@
 {
-  "name": "milkman-pro-admin",
-  "type": "module", 
+  "name": "milkman-pro-owner",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
