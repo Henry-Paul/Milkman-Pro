@@ -621,4 +621,254 @@ function App() {
           <div className="flex space-x-4 pt-4">
             <button
               type="submit"
-              className="flex-1 bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600
+              className="flex-1 bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors"
+            >
+              Record Delivery
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('dashboard')}
+              className="flex-1 bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  // Customer Details Component
+  const CustomerDetails = () => {
+    if (!selectedCustomer) return null;
+    
+    const customerDeliveries = deliveries.filter(d => d.customerId === selectedCustomer.id);
+    const deliveredThisMonth = customerDeliveries.filter(d => 
+      d.date.startsWith(new Date().toISOString().slice(0, 7)) && 
+      d.status === 'delivered'
+    ).length;
+    
+    const totalPackets = customerDeliveries
+      .filter(d => d.status === 'delivered')
+      .reduce((sum, d) => sum + d.packets, 0);
+    
+    const totalAmount = customerDeliveries
+      .filter(d => d.status === 'delivered')
+      .reduce((sum, d) => sum + d.amount, 0);
+
+    return (
+      <div className="p-6">
+        <button 
+          onClick={() => setActiveTab('customers')}
+          className="text-blue-500 hover:underline mb-4 flex items-center"
+        >
+          ← Back to Customers
+        </button>
+        
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{selectedCustomer.name}</h1>
+            <p className="text-gray-600 flex items-center mt-2">
+              <Phone className="h-4 w-4 mr-2" />
+              {selectedCustomer.phone}
+            </p>
+            <p className="text-gray-600 flex items-center mt-1">
+              <MapPin className="h-4 w-4 mr-2" />
+              {selectedCustomer.address}
+            </p>
+          </div>
+          <button 
+            onClick={() => {
+              setNewDelivery({
+                customerId: selectedCustomer.id,
+                packets: selectedCustomer.milkQuantity,
+                status: 'delivered',
+                notes: ''
+              });
+              setActiveTab('record-delivery');
+            }}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center"
+          >
+            <Truck className="h-4 w-4 mr-2" />
+            Record Delivery
+          </button>
+        </div>
+
+        {/* Customer Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-blue-600">{deliveredThisMonth}</div>
+            <div className="text-gray-600 text-sm">This Month</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-green-600">{totalPackets}</div>
+            <div className="text-gray-600 text-sm">Total Packets</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-purple-600">₹{totalAmount}</div>
+            <div className="text-gray-600 text-sm">Total Amount</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-orange-600">{selectedCustomer.milkQuantity}</div>
+            <div className="text-gray-600 text-sm">Daily Packets</div>
+          </div>
+        </div>
+
+        {/* Delivery Calendar */}
+        <DeliveryCalendar customerId={selectedCustomer.id} />
+
+        {/* Recent Deliveries */}
+        <div className="mt-6 bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4">Recent Deliveries</h2>
+          <div className="space-y-3">
+            {customerDeliveries.slice(0, 10).map(delivery => (
+              <div key={delivery.id} className="flex justify-between items-center p-3 border rounded-lg">
+                <div>
+                  <p className="font-semibold">{delivery.date}</p>
+                  <p className="text-sm text-gray-600">
+                    {delivery.status === 'delivered' ? `${delivery.packets} packets delivered` : 'Not delivered'}
+                    {delivery.notes && ` - ${delivery.notes}`}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold">₹{delivery.amount}</p>
+                  <p className={`text-sm ${
+                    delivery.status === 'delivered' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {delivery.status === 'delivered' ? '✓ Delivered' : '✗ Missed'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Reports Component
+  const Reports = () => (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Reports & Analytics</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Delivery Report */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <BarChart3 className="h-5 w-5 mr-2" />
+            Delivery Overview
+          </h2>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
+              <span>Total Deliveries This Month</span>
+              <span className="font-semibold">{deliveries.filter(d => d.date.startsWith(new Date().toISOString().slice(0, 7))).length}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-green-50 rounded">
+              <span>Successful Deliveries</span>
+              <span className="font-semibold">{deliveries.filter(d => d.status === 'delivered').length}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-red-50 rounded">
+              <span>Failed Deliveries</span>
+              <span className="font-semibold">{deliveries.filter(d => d.status === 'not-delivered').length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Revenue Report */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <DollarSign className="h-5 w-5 mr-2" />
+            Revenue Summary
+          </h2>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-green-50 rounded">
+              <span>Total Revenue</span>
+              <span className="font-semibold">₹{deliveries.reduce((sum, d) => sum + d.amount, 0)}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
+              <span>This Month</span>
+              <span className="font-semibold">₹{calculateMonthlyRevenue()}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-purple-50 rounded">
+              <span>Average per Customer</span>
+              <span className="font-semibold">₹{customers.length > 0 ? Math.round(calculateMonthlyRevenue() / customers.length) : 0}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!user) return <Login />;
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <Truck className="h-8 w-8 text-blue-600 mr-3" />
+              <h1 className="text-2xl font-bold text-gray-900">MilkMan Pro - Agency</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600">{user.name}</span>
+              <button 
+                onClick={() => setUser(null)}
+                className="text-gray-600 hover:text-gray-800 flex items-center"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex space-x-8">
+            {[
+              { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
+              { id: 'customers', name: 'Customers', icon: Users },
+              { id: 'record-delivery', name: 'Record Delivery', icon: Truck },
+              { id: 'reports', name: 'Reports', icon: DollarSign }
+            ].map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    if (tab.id !== 'customer-details') setSelectedCustomer(null);
+                  }}
+                  className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 mr-2" />
+                  {tab.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main>
+        {activeTab === 'dashboard' && <Dashboard />}
+        {activeTab === 'customers' && <CustomersList />}
+        {activeTab === 'add-customer' && <AddCustomer />}
+        {activeTab === 'record-delivery' && <RecordDelivery />}
+        {activeTab === 'customer-details' && <CustomerDetails />}
+        {activeTab === 'reports' && <Reports />}
+      </main>
+    </div>
+  );
+}
+
+export default App;
